@@ -1,0 +1,14 @@
+{
+  "name": "webman/arms",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=7.2",
+    "openzipkin/zipkin": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webman\\Arms\\": "src"
+    }
+  }
+}
