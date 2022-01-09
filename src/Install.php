@@ -9,7 +9,7 @@ class Install
      * @var array
      */
     protected static $pathRelation = array (
-  'config/plugin/arms' => 'config/plugin/arms',
+  'config/plugin/webman/arms' => 'config/plugin/webman/arms',
 );
 
     /**
@@ -55,10 +55,15 @@ class Install
     public static function uninstallByRelation()
     {
         foreach (static::$pathRelation as $source => $dest) {
-            /*if (is_link(base_path()."/$dest")) {
-                unlink(base_path()."/$dest");
+            $path = base_path()."/$dest";
+            if (!is_dir($path) && !is_file($path)) {
+                continue;
+            }
+            /*if (is_link($path) {
+                unlink($path);
             }*/
-            remove_dir(base_path()."/$dest");
+            remove_dir($path);
         }
     }
+
 }
