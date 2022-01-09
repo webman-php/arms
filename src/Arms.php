@@ -17,11 +17,11 @@ class Arms implements MiddlewareInterface
     {
         static $tracing = null, $tracer = null;
         if (!$tracing) {
-            $endpoint = Endpoint::create(config('plugin.arms.app.app_name'), $request->getRealIp(), null, 2555);
+            $endpoint = Endpoint::create(config('plugin.webman.arms.app.app_name'), $request->getRealIp(), null, 2555);
             $logger = new \Monolog\Logger('log');
             $logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
             $reporter = new \Zipkin\Reporters\Http([
-                'endpoint_url' => config('plugin.arms.app.endpoint_url')
+                'endpoint_url' => config('plugin.webman.arms.app.endpoint_url')
             ]);
             $sampler = BinarySampler::createAsAlwaysSample();
             $tracing = TracingBuilder::create()
