@@ -40,7 +40,10 @@ class Arms implements MiddlewareInterface
 
             if (class_exists('\Illuminate\Database\Events\QueryExecuted')) {
                 Db::listen(function (\Illuminate\Database\Events\QueryExecuted $query) {
-                    request()->rootSpan->tag('db.statement', $query->sql . " /*{$query->time}ms*/");
+                    $rootSpan = request()->rootSpan ?? null;
+                    if ($rootSpan) {
+                        $rootSpan->tag('db.statement', $query->sql . " /*{$query->time}ms*/");
+                    }
                 });
             }
         }
@@ -48,6 +51,7 @@ class Arms implements MiddlewareInterface
         $rootSpan = $tracer->newTrace();
         $rootSpan->setName($request->controller . "::" . $request->action);
         $rootSpan->start();
+        $request->rootSpan = $rootSpan;
         $result = $next($request);
 
         if (class_exists(\think\facade\Db::class)) {
