@@ -10,6 +10,7 @@ use Zipkin\Samplers\BinarySampler;
 use Zipkin\Endpoint;
 use Workerman\Timer;
 use support\Db;
+use const Zipkin\Tags\SQL_QUERY;
 
 class Arms implements MiddlewareInterface
 {
@@ -58,7 +59,11 @@ class Arms implements MiddlewareInterface
             $logs = \think\facade\Db::getDbLog(true);
             if (!empty($logs['sql'])) {
                 foreach ($logs['sql'] as $sql) {
-                    $rootSpan->tag('db.statement', $sql);
+                    $sqlSpan = $tracer->newChild($rootSpan->getContext());
+                    $sqlSpan->setName(SQL_QUERY);
+                    $sqlSpan->start();
+                    $sqlSpan->tag('db.statement', $sql);
+                    $sqlSpan->finish();
                 }
             }
         }
