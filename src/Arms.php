@@ -52,6 +52,7 @@ class Arms implements MiddlewareInterface
         $rootSpan = $tracer->newTrace();
         $rootSpan->setName($request->controller . "::" . $request->action);
         $rootSpan->start();
+        $request->tracer = $tracer;
         $request->rootSpan = $rootSpan;
         $result = $next($request);
 
