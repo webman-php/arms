@@ -32,7 +32,8 @@ class Arms implements MiddlewareInterface
                 ->build();
             $tracer = $tracing->getTracer();
             // 30秒上报一次，尽量将上报对业务的影响减少到最低
-            Timer::add(30, function () use ($tracer) {
+            $time_interval = config('plugin.webman.arms.app.time_interval', 30);
+            Timer::add($time_interval, function () use ($tracer) {
                 $tracer->flush();
             });
             register_shutdown_function(function () use ($tracer) {
@@ -40,10 +41,14 @@ class Arms implements MiddlewareInterface
             });
 
             if (class_exists('\Illuminate\Database\Events\QueryExecuted')) {
-                Db::listen(function (\Illuminate\Database\Events\QueryExecuted $query) {
+                Db::listen(function (\Illuminate\Database\Events\QueryExecuted $query) use ($tracer) {
                     $rootSpan = request()->rootSpan ?? null;
-                    if ($rootSpan) {
-                        $rootSpan->tag('db.statement', $query->sql . " /*{$query->time}ms*/");
+                    if ($rootSpan && 'select 1' != trim($query->sql)) {
+                        $sqlSpan = $tracer->newChild($rootSpan->getContext());
+                        $sqlSpan->setName(SQL_QUERY . ':' . $query->connectionName);
+                        $sqlSpan->start();
+                        $sqlSpan->tag('db.statement', $query->sql . " /*{$query->time}ms*/");
+                        $sqlSpan->finish();
                     }
                 });
             }
