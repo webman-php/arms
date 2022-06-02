@@ -19,6 +19,13 @@ class Install
     public static function install()
     {
         static::installByRelation();
+        $think_orm_config_path = config_path() . '/thinkorm.php';
+        if (!is_file($think_orm_config_path)) {
+            return;
+        }
+        $think_orm_config_content = file_get_contents($think_orm_config_path);
+        $think_orm_config_content = preg_replace('/\'trigger_sql\' *?=> *?false/', "'trigger_sql' => true", $think_orm_config_content);
+        file_put_contents($think_orm_config_path, $think_orm_config_content);
     }
 
     /**
@@ -28,6 +35,13 @@ class Install
     public static function uninstall()
     {
         self::uninstallByRelation();
+        $think_orm_config_path = config_path() . '/thinkorm.php';
+        if (!is_file($think_orm_config_path)) {
+            return;
+        }
+        $think_orm_config_content = file_get_contents($think_orm_config_path);
+        $think_orm_config_content = preg_replace('/\'trigger_sql\' *?=> *?true/', "'trigger_sql' => false", $think_orm_config_content);
+        file_put_contents($think_orm_config_path, $think_orm_config_content);
     }
 
     /**
