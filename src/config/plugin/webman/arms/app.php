@@ -6,4 +6,6 @@ return [
     'time_interval' => 30, //30秒上报一次，尽量将上报对业务的影响减少到最低
     'enable_request_params' => true, //是否记录入参，json格式呈现
     'enable_response_body' => true, //是否记录响应内容，如果存在响应数据太大或二进制，不建议开启
+    'enable_request_headers' => true, //是否记录请求头header，json格式呈现
+    'mask_headers' => ['authorization', 'cookie'], //记录请求头时脱敏的header名（小写）
 ];
